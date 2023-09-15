@@ -1,0 +1,47 @@
+.grid {
+    width: 40vw;
+    height: 40vw;
+    border: 1px solid red;
+    margin: 0 auto;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+  }
+
+.grid div {
+    width: 2vw;
+    height: 2vw;
+    border: 1px black dotted;
+    box-sizing: border-box; /* Ignores border volume */
+	  float: left;
+  }
+  
+.buttonGroup
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.blue {
+    background: blue;
+	}
+  
+.red {
+	background: red;
+	}
+
+.green {
+    background: green;
+	}
+  
+.white {
+	background: white;
+	}
+
+.pink {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+.lavender {
+  background-color: rgb(196, 130, 205);
+}
