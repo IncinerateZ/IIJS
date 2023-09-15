@@ -92,6 +92,10 @@ function GameOver() {
     window.location.reload();
 }
 
+function Reset() {
+    window.location.reload();
+}
+
 function CreateApple() {
     let randX = Math.floor(Math.random() * 20);
     let randY = Math.floor(Math.random() * 20);
@@ -115,6 +119,10 @@ function StartGame() {
 
     DrawBoard();
     document.addEventListener('keydown', KeyPressed);
+
+    let mainBtn = document.getElementById('mainBtn');
+    mainBtn.innerText = 'Restart';
+    mainBtn.onclick = Reset;
 }
 
 function Tick() {
