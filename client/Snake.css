@@ -22,6 +22,17 @@
 	justify-content: center;
 }
 
+#score {
+  position: absolute;
+  text-align: center;
+
+  font-size: 3rem;
+
+  opacity: 0.5;
+
+  border: none;
+}
+
 .blue {
     background: blue;
 	}

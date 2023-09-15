@@ -1,6 +1,6 @@
 function ClearGrid() {
     var DOMGrid = document.getElementById('grid_id');
-    DOMGrid.innerHTML = '';
+    DOMGrid.innerHTML = '<div id="score">0</div>';
 }
 
 function AddBlock(x, y, color) {

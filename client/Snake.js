@@ -50,6 +50,9 @@ const tickRate = 200;
 
 function DrawBoard() {
     ClearGrid();
+
+    document.getElementById('score').innerText = Snake.snake.length;
+
     for (let _y = 0; _y < 20; _y++) {
         Board[_y] = [];
         for (let _x = 0; _x < 20; _x++) {
@@ -88,7 +91,7 @@ function DrawBoard() {
 
 function GameOver() {
     clearInterval(Timer);
-    alert('You Died! Game Over!');
+    alert(`You Died! Game Over!\nYour Score Is ${Snake.snake.length}!`);
     window.location.reload();
 }
 
