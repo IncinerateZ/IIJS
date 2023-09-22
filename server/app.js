@@ -8,7 +8,7 @@ const server = createServer(app);
 
 let users = 0;
 
-const ip = '169.254.210.230';
+const ip = '192.168.37.92';
 
 setInterval(() => {
     if (users <= 0) return;
@@ -19,7 +19,7 @@ setInterval(() => {
 
 const io = new Server(server, {
     cors: {
-        origin: `http://${ip}:5500`,
+        origin: `http://${ip}:5501`,
         methods: ['GET', 'POST'],
     },
 });
@@ -30,6 +30,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         users--;
         console.log('User Disconnected');
+    });
+
+    socket.on('ping', () => {
+        socket.emit('pong');
     });
 });
 

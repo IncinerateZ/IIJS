@@ -8,14 +8,21 @@
 
     <script src="HelperLibrary.js"></script>
     <script src="Snake.js"></script>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 </head>
 
 
 <body>
 
-    <div id="grid_id" class="grid">
-        <div id="score">0</div>
+    <div id="grid-container">
+        <div id="grid_id" class="grid">
+            <div id="score">0</div>
+        </div>
+        <div id="image-layer"></div>
+
     </div>
+
+
 
     <div class="buttonGroup">
         <button onclick="StartGame()" class="start" id="mainBtn">Start Game</button>

@@ -3,15 +3,41 @@
 // Version:
 // Project: Snake Game
 
-const ip = '169.254.210.230';
+const ip = '192.168.37.92';
 
 window.onload = () => {
     console.log('Load');
+    loadAssets();
+
     const socket = io(`${ip}:3000`);
 
     socket.on('master', (msg) => {
         console.log(`Received ${msg}`);
     });
+
+    let pong = 0;
+    let pingNum = 100;
+
+    function ping() {
+        console.log('Pinged');
+        pong = new Date().getTime();
+        socket.emit('ping', 'ping');
+    }
+
+    socket.on('pong', (msg) => {
+        let now = new Date().getTime();
+        console.log(`Ping ${now - pong}ms`);
+
+        if (pingNum > 0) {
+            pingNum--;
+
+            setTimeout(() => {
+                ping();
+            }, 7);
+        }
+    });
+
+    ping();
 };
 
 var Timer;
@@ -29,6 +55,7 @@ const Snake = {
     dir: [1, 0],
     tentativeDir: [2, 0],
     symbol: 'S',
+    color: 'base',
 };
 
 const Bot = {
@@ -38,6 +65,8 @@ const Bot = {
     tentativeDir: [2, 0],
     spawned: false,
     symbol: 'B',
+    // color: 'invert(58%) sepia(67%) saturate(297%) hue-rotate(246deg) brightness(90%) contrast(89%)',
+    color: 'lavender',
 };
 
 let pendingObstacles = [];
@@ -49,9 +78,9 @@ let Apple = [5, 5];
 const tickRate = 200;
 
 function DrawBoard() {
-    ClearGrid();
-
-    document.getElementById('score').innerText = Snake.snake.length;
+    let tempgrid = document.createElement('div');
+    tempgrid.id = 'grid_id';
+    tempgrid.className = 'grid';
 
     for (let _y = 0; _y < 20; _y++) {
         Board[_y] = [];
@@ -59,15 +88,29 @@ function DrawBoard() {
             let symbol = '.';
             if (obstacles[`${_y}.${_x}`] === 1) symbol = 'P';
             symbol = isObstacle(obstacles, _y, _x) ? 'W' : symbol;
-            for (let s of Snake.snake) {
+
+            let snake_prev, snake_next;
+            for (let si = 0; si < Snake.snake.length; si++) {
+                let s = Snake.snake[si];
                 if (_x === s[0] && _y === s[1]) {
                     symbol = 'S';
+                    snake_prev = Snake.snake[si - 1];
+                    snake_next = Snake.snake[si + 1];
                     break;
                 }
             }
-            for (let s of Bot.snake) {
+
+            let isBot = false;
+            if (!snake_next && !snake_prev) isBot = true;
+
+            for (let si = 0; si < Bot.snake.length; si++) {
+                let s = Bot.snake[si];
                 if (_x === s[0] && _y === s[1]) {
                     symbol = 'B';
+                    if (isBot) {
+                        snake_prev = Bot.snake[si - 1];
+                        snake_next = Bot.snake[si + 1];
+                    }
                     break;
                 }
             }
@@ -77,16 +120,22 @@ function DrawBoard() {
                 _y,
                 _x,
                 {
-                    W: 'red',
-                    '.': 'white',
-                    S: 'blue',
-                    A: 'green',
-                    P: 'pink',
-                    B: 'lavender',
+                    W: 'fire',
+                    '.': 'grass',
+                    S: Snake.color,
+                    A: 'meat',
+                    P: 'ember',
+                    B: Bot.color,
                 }[symbol],
+                snake_prev,
+                snake_next,
+                tempgrid,
             );
         }
     }
+
+    RenderGrid(tempgrid);
+    document.getElementById('score').innerText = Snake.snake.length;
 }
 
 function GameOver() {
@@ -225,7 +274,7 @@ function Tick() {
     }
 
     //spawn bot if meets requirements
-    if (Snake.snake.length === 10 && !Bot.spawned) {
+    if (Snake.snake.length % 10 === 0 && Bot.snake.length === 0) {
         Bot.spawned = true;
 
         Bot.snake = [
