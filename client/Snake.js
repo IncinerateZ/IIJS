@@ -3,41 +3,11 @@
 // Version:
 // Project: Snake Game
 
-const ip = '192.168.37.92';
+const ip = window.location.hostname;
 
 window.onload = () => {
     console.log('Load');
     loadAssets();
-
-    const socket = io(`${ip}:3000`);
-
-    socket.on('master', (msg) => {
-        console.log(`Received ${msg}`);
-    });
-
-    let pong = 0;
-    let pingNum = 100;
-
-    function ping() {
-        console.log('Pinged');
-        pong = new Date().getTime();
-        socket.emit('ping', 'ping');
-    }
-
-    socket.on('pong', (msg) => {
-        let now = new Date().getTime();
-        console.log(`Ping ${now - pong}ms`);
-
-        if (pingNum > 0) {
-            pingNum--;
-
-            setTimeout(() => {
-                ping();
-            }, 7);
-        }
-    });
-
-    ping();
 };
 
 var Timer;
@@ -65,7 +35,6 @@ const Bot = {
     tentativeDir: [2, 0],
     spawned: false,
     symbol: 'B',
-    // color: 'invert(58%) sepia(67%) saturate(297%) hue-rotate(246deg) brightness(90%) contrast(89%)',
     color: 'lavender',
 };
 
@@ -138,10 +107,35 @@ function DrawBoard() {
     document.getElementById('score').innerText = Snake.snake.length;
 }
 
+function SinglePlayer() {
+    playSound('MUSIC');
+    playSound('BUTTON_CLICK');
+    document.getElementById('ui-layer').style.display = 'none';
+}
+
+function MultiPlayer() {
+    playSound('BUTTON_CLICK');
+
+    //sequence hack
+    setTimeout(() => {
+        let ign = '';
+        do {
+            ign = prompt('Enter a username (3 - 12 chars) for multiplayer');
+        } while (!(ign.length >= 3 && ign.length <= 12));
+
+        window.localStorage.setItem('username', ign);
+
+        window.location = window.location.origin + '/multiplayer';
+    }, 0);
+}
+
 function GameOver() {
     clearInterval(Timer);
-    alert(`You Died! Game Over!\nYour Score Is ${Snake.snake.length}!`);
-    window.location.reload();
+
+    setTimeout(() => {
+        alert(`You Died! Game Over!\nYour Score Is ${Snake.snake.length}!`);
+        window.location.reload();
+    }, 200);
 }
 
 function Reset() {
@@ -161,10 +155,17 @@ function CreateApple() {
         boardAt === 'P'
     )
         return CreateApple();
+
+    let reset = setTimeout(() => {
+        if (randX === Apple[0] && randY === Apple[1]) Apple = CreateApple();
+    }, 15000);
     return [randX, randY];
 }
 
 function StartGame() {
+    playSound('BUTTON_CLICK');
+    playSound('BACKGROUND');
+    document.getElementById('start-layer').style.display = 'none';
     Timer = setInterval(() => {
         Tick();
     }, tickRate);
@@ -189,10 +190,12 @@ function Tick() {
     if (Bot.snake.length > 0) {
         let botHead = Bot.snake[Bot.snake.length - 1];
 
+        //move to the next free space that is closest to the apple
         const avoidSymbols = { W: true, S: true, B: true };
 
         if (obstacleDelay <= 2500) avoidSymbols.P = true;
 
+        //get unit vector of direction to apple
         let vApple = [
             getSign(Apple[0] - botHead[0]),
             getSign(Apple[1] - botHead[1]),
@@ -207,6 +210,7 @@ function Tick() {
             if (!(boardAtV in avoidSymbols)) _tentativeDirs.push(vectors[v]);
         }
 
+        //rank moves by similarity to apple unit vector
         function botVRank(vApple, v) {
             let rank = 1;
 
@@ -222,12 +226,14 @@ function Tick() {
 
         let _tentativeDir = [1, 0];
 
+        //select highest ranked move that is not an opposite direction move
         for (let t of _tentativeDirs) {
             if (isReverseDirection(t, Bot.dir)) continue;
             _tentativeDir = t;
             break;
         }
 
+        //pend move for action
         Bot.tentativeDir = _tentativeDir;
 
         if (Bot.tentativeDir[0] !== 2) {
@@ -241,10 +247,14 @@ function Tick() {
 
     obstacleDelay -= tickRate;
 
-    //preview possible new wall
+    //spawn embers
     if (obstacleDelay <= 0) {
-        obstacleDelay = 5000 + getRandom(-1000, 2500);
+        playSound('EMBER_SPAWN');
 
+        //determine delay to next spawn embers
+        obstacleDelay = 7000 + getRandom(-1000, 3500);
+
+        //pick and render embers
         let _pendingObstacles = shapeObstacles(0);
 
         for (let p of _pendingObstacles) {
@@ -257,7 +267,7 @@ function Tick() {
     }
 
     //spawn wall chunks if not overlapping
-    if (obstacleDelay < 1000) {
+    if (obstacleDelay < 2000) {
         for (let p of pendingObstacles) {
             let sCoord = `${p[1]}.${p[0]}`;
 
@@ -267,6 +277,8 @@ function Tick() {
                 delete obstacles[sCoord];
                 continue;
             }
+
+            playSound('FIRE_IGNITE');
             obstacles[sCoord] = 2;
         }
 
@@ -336,8 +348,10 @@ const shapes = [
 ];
 
 function shapeObstacles(attempt) {
+    //stop after 6 failed attempts
     if (attempt === 6) return [];
 
+    //select random ember shape and check for validity
     let selectedShape = shapes[Math.floor(getRandom(0, shapes.length))];
 
     let maxX = Board[0].length;
@@ -395,9 +409,11 @@ function MoveSnake(snake) {
     let moveResult = _MoveSnake(snake.snake, snake.dir, Board, snake);
 
     if (!moveResult) {
+        playSound('DEATH');
         if (snake.symbol === 'B') return (snake.snake = []);
         return GameOver();
     } else if (moveResult === 'A') {
+        playSound('EAT');
         snake.doGrow = true;
         Apple = CreateApple();
     }
@@ -410,6 +426,8 @@ function UpdateDirection(snake, direction) {
 
 function _MoveSnake(Snake, dir, Board, Grow) {
     let tail = null;
+
+    //if has pending grow action then dont remove last element
     if (Grow.doGrow) Grow.doGrow = false;
     else tail = Snake.shift();
 

@@ -4,6 +4,18 @@ const Assets = {
     snake: { head: {}, body: {}, tail: {}, bend: {} },
     environment: { ember: null, fire: null, meat: null, grass: null },
 };
+
+const Sounds = {
+    BACKGROUND: { sound: 'bg_ambient', start: -1, stop: -1, volume: 0.025 },
+    MUSIC: { sound: 'bg_music', start: -1, stop: -1, volume: 0.2 },
+    BUTTON_CLICK: { sound: 'click', start: 0.5, stop: -1, volume: 0.9 },
+    COUNTDOWN: { sound: 'countdown', start: -1, stop: -1, volume: 0.5 },
+    DEATH: { sound: 'death', start: -1, stop: -1, volume: 0.5 },
+    EAT: { sound: 'eat', start: 0.5, stop: 0.55, volume: 0.5 },
+    EMBER_SPAWN: { sound: 'ember_spawn', start: -1, stop: 2.5, volume: 0.1 },
+    FIRE_IGNITE: { sound: 'fire_ignite', start: -1, stop: 1, volume: 0.3 },
+};
+
 function loadAssets() {
     for (let t in Assets) {
         for (let a in Assets[t]) {
@@ -14,24 +26,74 @@ function loadAssets() {
                 ocean: '00a4d6',
             };
 
-            axios.get(`./assets/${t}/${a}.svg`).then((res) => {
-                if (t === 'snake')
-                    for (let color in snakeColors) {
-                        let dat = res.data;
-                        if (color !== 'base') {
-                            dat = dat.replaceAll(
-                                snakeColors.base.toUpperCase(),
-                                snakeColors[color].toUpperCase(),
-                            );
+            fetch(`./assets/${t}/${a}.svg`)
+                .then((res) => res.text())
+                .then((res) => {
+                    if (t === 'snake') {
+                        let snakeHeads = document.getElementById('snake-heads');
+                        for (let color in snakeColors) {
+                            let dat = res;
+                            if (color !== 'base') {
+                                dat = dat.replaceAll(
+                                    snakeColors.base.toUpperCase(),
+                                    snakeColors[color].toUpperCase(),
+                                );
+                            }
+                            Assets[t][a][color] = dat;
+
+                            if (a !== 'head') continue;
+                            let head = document.createElement('div');
+                            head.innerHTML = dat;
+                            head.style.width = '25%';
+                            head.style.height = '100%';
+                            head.style.rotate = '180deg';
+
+                            snakeHeads.appendChild(head);
                         }
-                        Assets[t][a][color] = dat;
+                    } else {
+                        Assets[t][a] = res;
                     }
-                else {
-                    Assets[t][a] = res.data;
-                }
-            });
+                });
+
+            //axios implementation
+            // axios.get(`./assets/${t}/${a}.svg`).then((res) => {
+            //     if (t === 'snake')
+            //         for (let color in snakeColors) {
+            //             let dat = res.data;
+            //             if (color !== 'base') {
+            //                 dat = dat.replaceAll(
+            //                     snakeColors.base.toUpperCase(),
+            //                     snakeColors[color].toUpperCase(),
+            //                 );
+            //             }
+            //             Assets[t][a][color] = dat;
+            //         }
+            //     else {
+            //         Assets[t][a] = res.data;
+            //     }
+            // });
         }
     }
+
+    for (let t in Sounds) {
+        Sounds[t].sound = new Audio(`./assets/audio/${Sounds[t].sound}.mp3`);
+        Sounds[t].sound.volume = Sounds[t].volume;
+    }
+}
+
+function playSound(name) {
+    let sound = Sounds[name];
+
+    sound.sound.currentTime = 0;
+
+    if (sound.start !== -1) sound.sound.currentTime = sound.start;
+
+    sound.sound.play();
+
+    if (sound.stop !== -1)
+        setTimeout(() => {
+            sound.sound.pause();
+        }, sound.stop * 1000);
 }
 
 function ClearGrid() {

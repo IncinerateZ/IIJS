@@ -8,8 +8,6 @@ const server = createServer(app);
 
 let users = 0;
 
-const ip = '192.168.37.92';
-
 setInterval(() => {
     if (users <= 0) return;
     let msg = Math.random();
@@ -19,7 +17,7 @@ setInterval(() => {
 
 const io = new Server(server, {
     cors: {
-        origin: `http://${ip}:5501`,
+        origin: `*`,
         methods: ['GET', 'POST'],
     },
 });

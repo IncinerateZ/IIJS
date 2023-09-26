@@ -1,14 +1,14 @@
 <html>
 
 <head>
-    <title>Justin - Snake Project</title>
+    <title>Justin - Gluttony</title>
     <link rel="stylesheet" href="Snake.css">
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <!-- <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script> -->
 
     <script src="HelperLibrary.js"></script>
     <script src="Snake.js"></script>
-    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 </head>
 
 
@@ -16,16 +16,15 @@
 
     <div id="grid-container">
         <div id="grid_id" class="grid">
-            <div id="score">0</div>
+            <div id="score"></div>
         </div>
-        <div id="image-layer"></div>
+        <div id="start-layer"><button onclick="StartGame()" class="start" id="mainBtn">Start</button></div>
+        <div id="ui-layer"><img src="assets/UI/title.svg" /> <button
+                onclick="SinglePlayer()">Singleplayer</button><button onclick="MultiPlayer()">Multiplayer</button>
+            <span>202230241 Justin</span>
+            <div id="snake-heads"></div>
+        </div>
 
-    </div>
-
-
-
-    <div class="buttonGroup">
-        <button onclick="StartGame()" class="start" id="mainBtn">Start Game</button>
     </div>
 
 </body>
