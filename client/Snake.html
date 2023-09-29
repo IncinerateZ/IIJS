@@ -18,7 +18,10 @@
         <div id="grid_id" class="grid">
             <div id="score"></div>
         </div>
-        <div id="start-layer"><button onclick="StartGame()" class="start" id="mainBtn">Start</button></div>
+        <div id="start-layer"><button onclick="StartGame()" class="start" id="mainBtn">Start</button><button
+                onclick="playSound('BUTTON_CLICK'); setTimeout(() => {window.location.reload();}, 190)" class="start"
+                id="mainBtn">Back</button>
+        </div>
         <div id="ui-layer"><img src="assets/UI/title.svg" /> <button
                 onclick="SinglePlayer()">Singleplayer</button><button onclick="MultiPlayer()">Multiplayer</button>
             <span>202230241 Justin</span>

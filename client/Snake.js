@@ -56,6 +56,7 @@ function DrawBoard() {
         for (let _x = 0; _x < 20; _x++) {
             let symbol = '.';
             if (obstacles[`${_y}.${_x}`] === 1) symbol = 'P';
+            if (_x === Apple[0] && _y === Apple[1]) symbol = 'A';
             symbol = isObstacle(obstacles, _y, _x) ? 'W' : symbol;
 
             let snake_prev, snake_next;
@@ -83,7 +84,6 @@ function DrawBoard() {
                     break;
                 }
             }
-            if (_x === Apple[0] && _y === Apple[1]) symbol = 'A';
             Board[_y].push(symbol);
             AddBlock(
                 _y,
@@ -118,15 +118,8 @@ function MultiPlayer() {
 
     //sequence hack
     setTimeout(() => {
-        let ign = '';
-        do {
-            ign = prompt('Enter a username (3 - 12 chars) for multiplayer');
-        } while (!(ign.length >= 3 && ign.length <= 12));
-
-        window.localStorage.setItem('username', ign);
-
         window.location = window.location.origin + '/multiplayer';
-    }, 0);
+    }, 250);
 }
 
 function GameOver() {

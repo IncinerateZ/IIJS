@@ -11,7 +11,30 @@
 </head>
 
 <body>
-
+    <div class="screen" id="grass"></div>
+    <div class="screen" id="game"></div>
+    <div class="screen" id="countdown-screen"><span id="countdown"></span></div>
+    <div class="screen" id="title-screen"><img src="../assets/UI/title2.svg"><span id="title-status">Connecting to
+            the game server...</span></div>
+    <div class="screen" id="matching-screen">
+        <div id="matching-popup">
+            <div>Match Found</div>
+            <div id="show-ready-container">
+                <div id="ready-1"></div>
+                <div id="ready-2"></div>
+                <div id="ready-3"></div>
+                <div id="ready-4"></div>
+            </div>
+            <button class="button" id="ready">Ready</button>
+        </div>
+    </div>
+    <div class="screen" id="user-screen">
+        <div id="user-popup">
+            <div>Enter a username (3-12 chars)</div>
+            <input type="text" id="username">
+            <button class="button" onclick=" _setName()">Submit</button>
+        </div>
+    </div>
 </body>
 
 </html>

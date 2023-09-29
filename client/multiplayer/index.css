@@ -1,4 +1,167 @@
 body {
     background: rgb(15,101,8);
     background: radial-gradient(circle, rgba(15,101,8,1) 0%, rgba(9,59,5,1) 97%);
+
+    margin: 0;
+    padding: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    width: 100vw;
+    height: 100vh;
 }
+
+#grass div {
+    position: absolute;
+}
+
+#grass svg {
+    width: 100%;
+    height: 100%;
+}
+
+#game div {
+    position: absolute;
+}
+
+#game svg {
+    width: 100%;
+    height: 100%;
+}
+
+.screen {
+    position: fixed;
+    width: 98vh;
+    height: 98vh;
+
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    border: 2px solid black;
+}
+
+#user-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+    font-weight: bold;
+    font-size: 4rem;
+
+    opacity: 0.7;
+}
+
+#user-popup {
+    background-color: rgb(29, 110, 102);
+    width: 50%;
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 2px solid black;
+    border-radius: 5px;
+
+    font-size: 1.5rem;
+}
+
+#user-popup input {
+    width: 67.5%;
+    height: 2rem;
+
+    font-size: 1.5rem;
+
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+
+#matching-screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#matching-popup {
+    background-color: rgb(29, 110, 102);
+    width: 50%;
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 2px solid black;
+    border-radius: 5px;
+
+    font-size: 2rem;
+}
+
+#show-ready-container {
+    display: flex;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    width: 70px;
+
+    justify-content: space-evenly;
+}
+
+#show-ready-container div {
+    width: 10px;
+    height: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+
+#title-screen {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+    user-select: none;
+
+    background-color: #0F6508;
+}
+
+#title-screen img {
+    margin-top: 1rem;
+    width: 90%;
+}
+
+#title-screen #title-status {
+    font-size: 1.5rem;
+
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+}
+
+.button {
+    width: 70%;
+    height: 3rem;
+  
+    cursor: pointer;
+  
+    background-color: gray;
+    color: whitesmoke;
+  
+    font-size: 1.5rem;
+  
+    user-select: none;
+  
+    text-shadow: black 2px 2px;
+  }
