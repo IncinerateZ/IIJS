@@ -63,25 +63,24 @@ export default class GameServer {
 
             document.getElementById('title-screen').style.display = 'none';
 
-            function countdown(i) {
+            function countdown(i, client, uuid) {
                 if (i > 3)
                     return (document.getElementById(
                         'countdown-screen',
                     ).style.display = 'none');
 
-                document.getElementById('countdown').innerHTML = [
-                    '3',
-                    '2',
-                    '1',
-                    'GO!',
-                ][i];
+                document.getElementById('countdown').innerHTML = `<div>${
+                    ['3', '2', '1', 'GO!'][i]
+                }</div> <div style="rotate: 180deg;">${
+                    client.Images.snake.head[client.players[uuid].color]
+                }</div>`;
 
                 setTimeout(() => {
-                    countdown(i + 1);
+                    countdown(i + 1, client, uuid);
                 }, 1000);
             }
 
-            countdown(0);
+            countdown(0, this.client, this.uuid);
             this.client.playSound('COUNTDOWN');
 
             document.onkeydown = (e) => {
@@ -124,8 +123,6 @@ export default class GameServer {
     }
 
     setWorld(payload, trigger, firstRender) {
-        console.log('setworld');
-
         this.client.render(payload, firstRender);
 
         if (trigger) this.socket.emit(trigger, {});

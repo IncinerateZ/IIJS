@@ -132,8 +132,6 @@ export default class GameClient {
             }
         }
 
-        console.log(this);
-
         let canvas = document.getElementById('game');
         canvas.innerHTML = '';
 
@@ -278,8 +276,6 @@ export default class GameClient {
 
             rot = `${rotation}deg`;
         }
-
-        console.log(x + ' ' + y + ' ' + rot);
         this.toBlock(newDiv, x, y, rot);
 
         canvas.appendChild(newDiv);
@@ -315,20 +311,16 @@ export default class GameClient {
                     });
             }
         }
-
-        console.log(this.Images);
     }
 
     resultsScreen(payload) {
         let screen = document.getElementById('results-screen');
         screen.style.display = 'flex';
 
-        console.log(payload);
-
         screen.innerHTML = `<span>You ${
             payload.uuid === this.server.uuid ? 'Won' : 'Lost'
         }!</span>
-        <span>${payload.ign} Won.</span>
+        <span>${payload.ign || 'Nobody'} Won.</span>
         <span>Returning to lobby in 10 seconds...</span>`;
 
         setTimeout(() => {

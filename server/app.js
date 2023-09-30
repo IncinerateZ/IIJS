@@ -14,7 +14,8 @@ const players = {};
 const games = {};
 const gameQueue = {};
 
-//first default game
+//first two lobbies
+createGame();
 createGame();
 
 function createGame() {
