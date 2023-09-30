@@ -18,7 +18,7 @@ module.exports = class Game {
         this.gameState = 'matching';
 
         this.playersLoaded = 0;
-        this.maxPlayers = 2;
+        this.maxPlayers = 4;
         this.playersAlive = 0;
 
         this.players = {};
