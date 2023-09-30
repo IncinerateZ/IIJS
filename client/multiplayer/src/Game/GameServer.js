@@ -54,6 +54,7 @@ export default class GameServer {
             if (payload.listen)
                 this.socket.on(payload.listen, (data) => {
                     this.setWorld(data, payload.trigger, true);
+                    this.client.playSound('BACKGROUND');
                 });
         });
 
@@ -64,8 +65,9 @@ export default class GameServer {
 
             function countdown(i) {
                 if (i > 3)
-                    return (document.getElementById('countdown').style.display =
-                        'none');
+                    return (document.getElementById(
+                        'countdown-screen',
+                    ).style.display = 'none');
 
                 document.getElementById('countdown').innerHTML = [
                     '3',
@@ -103,6 +105,22 @@ export default class GameServer {
         this.socket.on('game_playerJoin', (payload) =>
             console.log(payload.msg),
         );
+
+        this.socket.on('game_update', (payload) =>
+            this.setWorld(payload, payload.trigger, false),
+        );
+
+        this.socket.on('player_events', (payload) => {
+            for (let event in payload)
+                this.client.playSound(event.toUpperCase());
+        });
+
+        this.socket.on('game_ended', (payload) => {
+            if (payload.uuid === this.uuid) this.client.playSound('VICTORY');
+            else this.client.playSound('DEFEAT');
+
+            this.client.resultsScreen(payload);
+        });
     }
 
     setWorld(payload, trigger, firstRender) {

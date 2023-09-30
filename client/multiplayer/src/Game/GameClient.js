@@ -42,6 +42,18 @@ export default class GameClient {
                 stop: -1,
                 volume: 0.1,
             },
+            VICTORY: {
+                sound: 'victory',
+                start: -1,
+                stop: -1,
+                volume: 0.1,
+            },
+            DEFEAT: {
+                sound: 'defeat',
+                start: -1,
+                stop: -1,
+                volume: 0.1,
+            },
         };
 
         this.Images = {
@@ -123,6 +135,7 @@ export default class GameClient {
         console.log(this);
 
         let canvas = document.getElementById('game');
+        canvas.innerHTML = '';
 
         //draw order: embers & fire, food, snake
         for (let y in this.obstacles) {
@@ -131,10 +144,21 @@ export default class GameClient {
 
                 this.toBlock(obstacle, x, y);
 
-                obstacle.innerHTML =
-                    this.Images.environment[this.obstacles[y][x]];
+                obstacle.innerHTML = this.Images.environment['fire'];
 
                 canvas.appendChild(obstacle);
+            }
+        }
+
+        for (let y in this.embers) {
+            for (let x in this.embers[y]) {
+                let ember = document.createElement('div');
+
+                this.toBlock(ember, x, y);
+
+                ember.innerHTML = this.Images.environment['ember'];
+
+                canvas.appendChild(ember);
             }
         }
 
@@ -176,10 +200,10 @@ export default class GameClient {
         if (!snake_prev && snake_next) {
             let vector =
                 this.getSign(snake_next[0] - x) +
-                '.' +
+                ',' +
                 this.getSign(snake_next[1] - y);
 
-            let rotation = { '0.-1': 0, 0.1: 180, '-1.0': -90, '1.0': 90 }[
+            let rotation = { '0,-1': 0, '0,1': 180, '-1,0': -90, '1,0': 90 }[
                 vector
             ];
 
@@ -194,10 +218,10 @@ export default class GameClient {
                 snake_prev = [x - player.dir[0], y - player.dir[1]];
             let vector =
                 this.getSign(x - snake_prev[0]) +
-                '.' +
+                ',' +
                 this.getSign(y - snake_prev[1]);
 
-            let rotation = { '0.-1': 0, 0.1: 180, '-1.0': -90, '1.0': 90 }[
+            let rotation = { '0,-1': 0, '0,1': 180, '-1,0': -90, '1,0': 90 }[
                 vector
             ];
 
@@ -213,7 +237,7 @@ export default class GameClient {
         ) {
             let vector =
                 this.getSign(x - snake_prev[0]) +
-                '.' +
+                ',' +
                 this.getSign(y - snake_prev[1]);
 
             let rotation = { '0,-1': 0, '0,1': 180, '-1,0': -90, '1,0': 90 }[
@@ -229,7 +253,7 @@ export default class GameClient {
         else {
             let vector =
                 this.getSign(snake_next[0] - snake_prev[0]) +
-                '.' +
+                ',' +
                 this.getSign(snake_next[1] - snake_prev[1]);
 
             let rotation = null;
@@ -255,6 +279,7 @@ export default class GameClient {
             rot = `${rotation}deg`;
         }
 
+        console.log(x + ' ' + y + ' ' + rot);
         this.toBlock(newDiv, x, y, rot);
 
         canvas.appendChild(newDiv);
@@ -292,5 +317,22 @@ export default class GameClient {
         }
 
         console.log(this.Images);
+    }
+
+    resultsScreen(payload) {
+        let screen = document.getElementById('results-screen');
+        screen.style.display = 'flex';
+
+        console.log(payload);
+
+        screen.innerHTML = `<span>You ${
+            payload.uuid === this.server.uuid ? 'Won' : 'Lost'
+        }!</span>
+        <span>${payload.ign} Won.</span>
+        <span>Returning to lobby in 10 seconds...</span>`;
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 10000);
     }
 }

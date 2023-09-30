@@ -6,9 +6,16 @@ let client;
 window.onload = () => {
     console.log('Load');
 
+    autoName();
+
     client = new GameClient();
     client.loadAssets();
 };
+
+function autoName() {
+    let name = window.localStorage.getItem('username');
+    if (name) document.getElementById('username').value = name;
+}
 
 window._setName = function () {
     let name = document.getElementById('username').value;

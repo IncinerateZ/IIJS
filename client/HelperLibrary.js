@@ -117,8 +117,8 @@ function AddBlock(y, x, color, snake_prev, snake_next, tempgrid) {
                 getSign(snake_next[1] - y),
             ];
 
-            let rotation = { '0.-1': 0, 0.1: 180, '-1.0': -90, '1.0': 90 }[
-                `${vector[0]}.${vector[1]}`
+            let rotation = { '0,-1': 0, '0,1': 180, '-1,0': -90, '1,0': 90 }[
+                `${vector[0]},${vector[1]}`
             ];
 
             newDiv.innerHTML = Assets.snake.tail[color];
@@ -133,8 +133,8 @@ function AddBlock(y, x, color, snake_prev, snake_next, tempgrid) {
                 getSign(y - snake_prev[1]),
             ];
 
-            let rotation = { '0.-1': 0, 0.1: 180, '-1.0': -90, '1.0': 90 }[
-                `${vector[0]}.${vector[1]}`
+            let rotation = { '0,-1': 0, '0,1': 180, '-1,0': -90, '1,0': 90 }[
+                `${vector[0]},${vector[1]}`
             ];
 
             newDiv.innerHTML = Assets.snake.head[color];
