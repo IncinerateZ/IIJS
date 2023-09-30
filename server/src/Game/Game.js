@@ -14,6 +14,8 @@ module.exports = class Game {
         this.endGame = endGame;
         this.enqueuePlayer = enqueuePlayer;
 
+        this.forceStart = null;
+
         //matching, launching, started, ended
         this.gameState = 'matching';
 
@@ -86,6 +88,8 @@ module.exports = class Game {
         if (this.gameState !== 'matching') return false;
         if (Object.keys(this.players).length >= this.maxPlayers) return false;
 
+        clearInterval(this.forceStart);
+
         player.gameId = this.id;
         player.ready = false;
         this.players[player.uuid] = player;
@@ -93,6 +97,13 @@ module.exports = class Game {
         if (Object.keys(this.players).length >= this.maxPlayers) {
             this.enqueue();
             if (this.gameState === 'matching') this.matchmake();
+        }
+
+        if (Object.keys(this.players).length >= 2) {
+            this.forceStart = setTimeout(() => {
+                this.enqueue();
+                if (this.gameState === 'matching') this.matchmake();
+            }, 30000);
         }
 
         let playerJoinEvent = new EmittableEvent('game', 'playerJoin');
@@ -139,6 +150,7 @@ module.exports = class Game {
     }
 
     matchmake() {
+        clearInterval(this.forceStart);
         this.stateId = Snowflake.generate();
 
         let matchEvent = new EmittableEvent('game', 'matching');
