@@ -135,7 +135,7 @@ export default class GameClient {
         let canvas = document.getElementById('game');
         canvas.innerHTML = '';
 
-        //draw order: embers & fire, food, snake
+        //draw order: fire, ember, food, snake
         for (let y in this.obstacles) {
             for (let x in this.obstacles[y]) {
                 let obstacle = document.createElement('div');

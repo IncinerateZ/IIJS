@@ -424,6 +424,7 @@ module.exports = class Game {
                 player.snake = [];
                 player.hitMap = {};
 
+                //1 in 3 chance of dropping meat per snake length
                 for (let loc of possibleFoodSpawnLocs)
                     if (Utils.randChoice([true, false, false]))
                         this.spawnFood(2, loc[0], loc[1]);

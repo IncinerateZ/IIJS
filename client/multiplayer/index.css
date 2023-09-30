@@ -103,6 +103,10 @@ body {
     margin-bottom: 0.2rem;
 }
 
+#user-popup button {
+    margin-top: 0.5rem;
+}
+
 
 #matching-screen {
     display: none;
@@ -150,7 +154,6 @@ body {
     align-items: center;
     justify-content: center;
 
-    pointer-events: none;
     user-select: none;
 
     background-color: #0F6508;
