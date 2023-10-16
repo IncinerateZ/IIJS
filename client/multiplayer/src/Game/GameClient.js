@@ -101,16 +101,9 @@ export default class GameClient {
                     if (this.players[this.server.uuid].color === color) {
                         this.Images.snake[type][color] = this.Images.snake[
                             type
-                        ][color].replaceAll(
-                            'stroke="black"',
-                            'stroke="#F5FF83"',
-                        );
-                        this.Images.snake[type][color] = this.Images.snake[
-                            type
-                        ][color].replaceAll(
-                            'stroke-width="2"',
-                            'stroke-width="4"',
-                        );
+                        ][color]
+                            .replaceAll('stroke="black"', 'stroke="#F5FF83"')
+                            .replaceAll('stroke-width="2"', 'stroke-width="4"');
                     }
                 }
             }

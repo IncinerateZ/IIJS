@@ -116,7 +116,7 @@ function SinglePlayer() {
 function MultiPlayer() {
     playSound('BUTTON_CLICK');
 
-    //sequence hack
+    //delay to after playsound
     setTimeout(() => {
         window.location = window.location.origin + '/multiplayer';
     }, 250);

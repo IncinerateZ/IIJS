@@ -228,6 +228,10 @@ module.exports = class Game {
             baseColor: this.snakeColors[0],
         };
 
+        let initializeFallback = setInterval(() => {
+            initializeEvent.emit();
+        }, 10000);
+
         for (let player in this.players) {
             player = this.players[player];
 
@@ -240,6 +244,8 @@ module.exports = class Game {
                 this.playersLoaded++;
 
                 if (this.playersLoaded >= Object.keys(this.players).length) {
+                    clearInterval(initializeFallback);
+
                     let countdown = 4000;
 
                     initializeEvent.setType('countdown');
