@@ -153,9 +153,7 @@ module.exports = class Game {
         clearInterval(this.forceStart);
         this.stateId = Snowflake.generate();
 
-        let matchEvent = new EmittableEvent('game', 'matching');
-        let launchEvent = new EmittableEvent('game', 'launching');
-        let playerReadiedEvent = new EmittableEvent('game', 'accepted');
+        let emitToAllEvent = new EmittableEvent();
 
         let duration = 10000;
 
@@ -170,43 +168,45 @@ module.exports = class Game {
             player = this.players[player];
 
             player.ready = false;
-            matchEvent.addPlayers(player);
-            launchEvent.addPlayers(player);
-            playerReadiedEvent.addPlayers(player);
+            emitToAllEvent.addPlayers(player);
 
             player.socket.on('player_ready', () => {
                 console.log(`${player.uuid} ready`);
                 player.ready = true;
                 readyNum++;
 
-                playerReadiedEvent.emit();
-                this.initializeGame(launchEvent, readyNum, abort);
+                emitToAllEvent.setEvent('game', 'accepted');
+                emitToAllEvent.setPayload({});
+                emitToAllEvent.emit();
+
+                this.initializeGame(emitToAllEvent, readyNum);
             });
         }
 
-        matchEvent.setPayload({
+        emitToAllEvent.setEvent('game', 'matching');
+        emitToAllEvent.setPayload({
             time: duration,
             playersReady: 0,
             playersCount: Object.keys(this.players).length,
             trigger: 'player_ready',
         });
-
-        matchEvent.emit();
+        emitToAllEvent.emit();
     }
 
-    initializeGame(launchEvent, readyNum, abort, force = false) {
+    initializeGame(emitToAllEvent, readyNum, force = false) {
         let numPlayers = Object.keys(this.players).length;
         if (!force && (numPlayers < this.maxPlayers || readyNum < numPlayers))
             return false;
 
         this.stateId = Snowflake.generate();
 
-        launchEvent.setPayload({
+        emitToAllEvent.setEvent('game', 'launching');
+        emitToAllEvent.setPayload({
             trigger: 'player_load',
             listen: 'game_initialize',
         });
 
-        launchEvent.emit();
+        emitToAllEvent.emit();
 
         this.dequeue(this.id);
         this.gameState = 'launching';
@@ -215,7 +215,7 @@ module.exports = class Game {
         this._setup();
 
         //send world data
-        let initializeEvent = new EmittableEvent('game', 'initialize');
+        emitToAllEvent.setEvent('game', 'initialize');
         let intializePayload = {
             players: {},
             foods: this.foods,
@@ -229,14 +229,13 @@ module.exports = class Game {
         };
 
         let initializeFallback = setInterval(() => {
-            initializeEvent.emit();
+            emitToAllEvent.emit();
         }, 10000);
 
         for (let player in this.players) {
             player = this.players[player];
 
             intializePayload.players[player.uuid] = player.game;
-            initializeEvent.addPlayers(player);
 
             player.socket.on('player_load', () => {
                 console.log(player.uuid + ' Loaded');
@@ -248,9 +247,9 @@ module.exports = class Game {
 
                     let countdown = 4000;
 
-                    initializeEvent.setType('countdown');
-                    initializeEvent.setPayload({ time: countdown });
-                    initializeEvent.emit();
+                    emitToAllEvent.setType('countdown');
+                    emitToAllEvent.setPayload({ time: countdown });
+                    emitToAllEvent.emit();
 
                     setTimeout(() => {
                         //start game
@@ -259,8 +258,8 @@ module.exports = class Game {
                 }
             });
         }
-        initializeEvent.setPayload(intializePayload);
-        initializeEvent.emit();
+        emitToAllEvent.setPayload(intializePayload);
+        emitToAllEvent.emit();
 
         return true;
     }
@@ -338,9 +337,8 @@ module.exports = class Game {
 
     _gameLoop(i) {
         if (i === 10) this.spawnFood(1);
-        let gameUpdateEvent = new EmittableEvent('game', 'update');
-        let gameEndedEvent = new EmittableEvent('game', 'ended');
-        let playerEvents = new EmittableEvent('player', 'events');
+
+        let emitToAllEvent = new EmittableEvent();
 
         this.prevStateId = this.stateId;
         this.stateId = Snowflake.generate();
@@ -381,12 +379,11 @@ module.exports = class Game {
         for (let player in this.players) {
             let playerId = player;
 
+            emitToAllEvent.addPlayers(this.players[player]);
+
             //crashes if not removed
             let ePlayer = { ...this.players[playerId] };
             delete ePlayer.socket;
-
-            gameUpdateEvent.addPlayers(this.players[player]);
-            playerEvents.addPlayers(this.players[player]);
 
             player = this.players[player].game;
             if (player.snake.length === 0) continue;
@@ -462,7 +459,8 @@ module.exports = class Game {
             playerData[playerId] = player;
         }
 
-        gameUpdateEvent.setPayload({
+        emitToAllEvent.setEvent('game', 'update');
+        emitToAllEvent.setPayload({
             players: playerData,
             foods: this.foods,
             obstacles: this.obstacles,
@@ -470,29 +468,29 @@ module.exports = class Game {
             gameTick: this.stateId,
             prevGameTick: this.prevStateId,
         });
-
-        gameUpdateEvent.emit();
+        emitToAllEvent.emit();
 
         if (Object.keys(playerEventsData).length > 0) {
-            playerEvents.setPayload(playerEventsData);
-            playerEvents.emit();
+            emitToAllEvent.setEvent('player', 'events');
+            emitToAllEvent.setPayload(playerEventsData);
+            emitToAllEvent.emit();
         }
 
         if (this.playersAlive <= 1) {
             this.gameState = 'ended';
 
+            emitToAllEvent.setEvent('game', 'ended');
             for (let player in this.players) {
                 player = this.players[player];
 
-                gameEndedEvent.addPlayers(player);
                 if (player.game.snake.length > 0)
-                    gameEndedEvent.setPayload({
+                    emitToAllEvent.setPayload({
                         ...player.game,
                         uuid: player.uuid,
                     });
             }
+            emitToAllEvent.emit();
 
-            gameEndedEvent.emit();
             this.endGame(this.id);
         }
 
