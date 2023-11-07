@@ -63,6 +63,8 @@ export default class GameClient {
 
         this.width = document.getElementById('game').clientWidth;
         this.height = document.getElementById('game').clientHeight;
+
+        this.gameOver = false;
     }
 
     connect(server) {
@@ -307,6 +309,8 @@ export default class GameClient {
     }
 
     resultsScreen(payload) {
+        this.gameOver = true;
+
         let screen = document.getElementById('results-screen');
         screen.style.display = 'flex';
 
@@ -319,5 +323,18 @@ export default class GameClient {
         setTimeout(() => {
             window.location.reload();
         }, 10000);
+    }
+
+    deathScreen() {
+        let screen = document.getElementById('results-screen');
+        screen.style.display = 'flex';
+
+        screen.innerHTML = `<span>You Died!</span>
+        <span>Spectating...</span>`;
+
+        setTimeout(() => {
+            if (this.gameOver) return;
+            screen.style.display = 'none';
+        }, 3000);
     }
 }

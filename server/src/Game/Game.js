@@ -5,10 +5,12 @@ const Utils = require('../Utils/Utils');
 
 module.exports = class Game {
     constructor(id, dequeue, enqueue, enqueuePlayer, endGame) {
+        // state management
         this.id = id;
         this.stateId = Snowflake.generate();
         this.prevStateId = -1;
 
+        // game housekeeping functions
         this.dequeue = dequeue;
         this.enqueue = enqueue;
         this.endGame = endGame;
@@ -26,6 +28,7 @@ module.exports = class Game {
         this.players = {};
         this.foods = {};
 
+        // dynamic snake colors
         this.snakeColors = ['00771A', 'c482cd', 'bd2525', '00a4d6'];
 
         this.obstacles = {};
@@ -42,7 +45,8 @@ module.exports = class Game {
         this.BASE_IGNITION_TIME = 7500;
         this.BASE_EMBER_SPAWN_TIME = 6000;
 
-        this.shapes = [
+        //obstacles
+        this.obstacle_shapes = [
             [
                 [0, 1, 0],
                 [1, 1, 1],
@@ -94,16 +98,18 @@ module.exports = class Game {
         player.ready = false;
         this.players[player.uuid] = player;
 
+        //when 4 slots are filled then start and queue a new game
         if (Object.keys(this.players).length >= this.maxPlayers) {
             this.enqueue();
             if (this.gameState === 'matching') this.matchmake();
         }
 
+        //after some time if at least 2 players are still queueing then start the game anyways
         if (Object.keys(this.players).length >= 2) {
             this.forceStart = setTimeout(() => {
                 this.enqueue();
                 if (this.gameState === 'matching') this.matchmake(true);
-            }, 10000);
+            }, 30000);
         }
 
         let playerJoinEvent = new EmittableEvent('game', 'playerJoin');
@@ -195,13 +201,13 @@ module.exports = class Game {
 
     initializeGame(emitToAllEvent, readyNum, force = false) {
         let numPlayers = Object.keys(this.players).length;
+
+        // if not all players have readied return
         if (
             !(force && readyNum >= numPlayers) &&
             (numPlayers < this.maxPlayers || readyNum < numPlayers)
         )
             return false;
-
-        // if (!(force && readyNum >= numPlayers)) return false;
 
         this.stateId = Snowflake.generate();
 
@@ -233,6 +239,7 @@ module.exports = class Game {
             baseColor: this.snakeColors[0],
         };
 
+        //resend world init data after some time (redundant?)
         let initializeFallback = setInterval(() => {
             emitToAllEvent.setEvent('game', 'initialize');
             emitToAllEvent.setPayload(intializePayload);
@@ -244,6 +251,7 @@ module.exports = class Game {
 
             intializePayload.players[player.uuid] = player.game;
 
+            //start the game when all players have finished loading
             player.socket.on('player_load', () => {
                 console.log(player.uuid + ' Loaded');
                 //start countdown
@@ -325,6 +333,7 @@ module.exports = class Game {
         this.gameState = 'started';
         this.stateId = Snowflake.generate();
 
+        // bind action listeners
         for (let player of Object.values(this.players)) {
             for (let actionListener in this.ActionListeners)
                 player.socket.on(actionListener, (payload) => {
@@ -466,6 +475,7 @@ module.exports = class Game {
             playerData[playerId] = player;
         }
 
+        // send game data to clients every tick
         emitToAllEvent.setEvent('game', 'update');
         emitToAllEvent.setPayload({
             players: playerData,
@@ -483,6 +493,7 @@ module.exports = class Game {
             emitToAllEvent.emit();
         }
 
+        // win check
         if (this.playersAlive <= 1) {
             this.gameState = 'ended';
 
@@ -500,7 +511,7 @@ module.exports = class Game {
 
             this.endGame(this.id);
         }
-
+        
         if (this.gameState !== 'ended')
             setTimeout(() => {
                 this._gameLoop(i + 1);
@@ -536,7 +547,7 @@ module.exports = class Game {
         if (attempt === 6) return [];
 
         //select random ember shape and check for validity
-        let selectedShape = Utils.randChoice(this.shapes);
+        let selectedShape = Utils.randChoice(this.obstacle_shapes);
 
         let maxX = this.mapWidth;
         let maxY = this.mapHeight;

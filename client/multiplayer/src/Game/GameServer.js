@@ -110,8 +110,18 @@ export default class GameServer {
         );
 
         this.socket.on('player_events', (payload) => {
-            for (let event in payload)
+            for (let event in payload) {
                 this.client.playSound(event.toUpperCase());
+
+                if (event === 'death') {
+                    for (let player of payload[event]) {
+                        if (player.uuid === this.uuid) {
+                            this.client.deathScreen();
+                            break;
+                        }
+                    }
+                }
+            }
         });
 
         this.socket.on('game_ended', (payload) => {
