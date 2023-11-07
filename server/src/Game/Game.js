@@ -102,8 +102,8 @@ module.exports = class Game {
         if (Object.keys(this.players).length >= 2) {
             this.forceStart = setTimeout(() => {
                 this.enqueue();
-                if (this.gameState === 'matching') this.matchmake();
-            }, 30000);
+                if (this.gameState === 'matching') this.matchmake(true);
+            }, 10000);
         }
 
         let playerJoinEvent = new EmittableEvent('game', 'playerJoin');
@@ -149,7 +149,7 @@ module.exports = class Game {
         event.emit();
     }
 
-    matchmake() {
+    matchmake(force) {
         clearInterval(this.forceStart);
         this.stateId = Snowflake.generate();
 
@@ -179,7 +179,7 @@ module.exports = class Game {
                 emitToAllEvent.setPayload({});
                 emitToAllEvent.emit();
 
-                this.initializeGame(emitToAllEvent, readyNum);
+                this.initializeGame(emitToAllEvent, readyNum, force);
             });
         }
 
@@ -195,8 +195,13 @@ module.exports = class Game {
 
     initializeGame(emitToAllEvent, readyNum, force = false) {
         let numPlayers = Object.keys(this.players).length;
-        if (!force && (numPlayers < this.maxPlayers || readyNum < numPlayers))
+        if (
+            !(force && readyNum >= numPlayers) &&
+            (numPlayers < this.maxPlayers || readyNum < numPlayers)
+        )
             return false;
+
+        // if (!(force && readyNum >= numPlayers)) return false;
 
         this.stateId = Snowflake.generate();
 
@@ -229,6 +234,8 @@ module.exports = class Game {
         };
 
         let initializeFallback = setInterval(() => {
+            emitToAllEvent.setEvent('game', 'initialize');
+            emitToAllEvent.setPayload(intializePayload);
             emitToAllEvent.emit();
         }, 10000);
 
