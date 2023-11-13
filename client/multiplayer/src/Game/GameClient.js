@@ -303,6 +303,12 @@ export default class GameClient {
                     .then((res) => res.text())
                     .then((res) => {
                         this.Images[entity][type] = res;
+                    })
+                    .catch((err) => {
+                        console.log(
+                            `Error: Failed to fetch game assets [${entity} ${type}]`,
+                        );
+                        console.log(err);
                     });
             }
         }
