@@ -15,7 +15,7 @@ The snake project requires the front-end to be hosted, and for multiplayer the s
 
 -   Install [NodeJS LTS](https://nodejs.org/en/download/current), and the Node Package Manager (`npm`) along with it.
 
--   With the command prompt, navigate to the `server` directory, and enter the command `node app`. The server should be accessible at port `:3000`.
+-   With the command prompt, navigate to the `server` directory, enter the command `npm i` to install the dependencies and then enter the command `node app` to start the server. The server should be accessible at port `3000`.
 
 -   For other people to access the game, on windows with the command prompt enter the command `ipconfig`, and the website should be accessible for people at the same Wi-Fi network, at the ip address listed as `IPv4 Address. . . . . . . . . .  : x.x.x.x` with the `client` port: `x.x.x.x:{port}/client/Snake.html`.
 
