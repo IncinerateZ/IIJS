@@ -1,6 +1,6 @@
 # Snake Project
 
-The snake project requires the front-end to be hosted, and for multiplayer the server to be hosted seperately.
+The snake project for a university class requires the front-end to be hosted, and for multiplayer the server to be hosted seperately.
 
 ## Setting Up
 
